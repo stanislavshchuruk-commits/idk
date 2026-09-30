@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SafeNet Quest: прокачай свою інтернет-безпеку</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = { theme: { extend: { fontFamily: {
+    display: ['Unbounded','Manrope','system-ui','sans-serif'],
+    body: ['Manrope','system-ui','sans-serif'],
+    mono: ['JetBrains Mono','ui-monospace','monospace'] } } } };
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/canvas-confetti/1.9.2/confetti.browser.min.js"></script>
+<style>
+:root{
+  --bg:#090d16; --bg2:#0f172a; --line:rgba(148,163,184,.16);
+  --cyan:#22e4ff; --purple:#a855f7; --green:#39ff88; --yellow:#ffd23f; --pink:#ff4d8d;
+  --text:#e8eefc; --muted:#93a3c0;
+  color-scheme: dark;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:calc(env(safe-area-inset-top,0px) + 84px);background:#090d16;height:auto}
+body{
+  margin:0;color:var(--text);font-family:'Manrope',system-ui,sans-serif;line-height:1.55;overflow-x:hidden;
+  background:
+    radial-gradient(900px 500px at 85% -5%, rgba(168,85,247,.20), transparent 60%),
+    radial-gradient(800px 500px at 0% 30%, rgba(34,228,255,.12), transparent 60%),
+    #090d16;
+  background-attachment:fixed;
+}
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.5;
+  background-image:linear-gradient(rgba(148,163,184,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(148,163,184,.05) 1px,transparent 1px);
+  background-size:44px 44px;mask-image:radial-gradient(ellipse at center,#000 30%,transparent 80%);-webkit-mask-image:radial-gradient(ellipse at center,#000 30%,transparent 80%)}
+body.hacker{--cyan:#39ff88;--purple:#00b35a}
+main,header,footer{position:relative;z-index:1}
+h1,h2,h3{font-family:'Unbounded','Manrope',system-ui,sans-serif;line-height:1.2;margin:0;overflow-wrap:break-word}
+::selection{background:var(--purple);color:#fff}
+:focus-visible{outline:2px solid var(--cyan);outline-offset:3px;border-radius:8px}
+::-webkit-scrollbar{width:11px}
+::-webkit-scrollbar-track{background:#0b1120}
+::-webkit-scrollbar-thumb{background:linear-gradient(var(--cyan),var(--purple));border-radius:10px;border:2px solid #0b1120}
+.wrap{width:100%;max-width:1160px;margin:0 auto;padding:0 20px}
+
+.glass{background:rgba(15,23,42,.58);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:22px;transition:all .3s ease-in-out}
+.lift:hover{transform:translateY(-5px);border-color:rgba(34,228,255,.45);box-shadow:0 14px 40px -12px rgba(34,228,255,.35),0 0 0 1px rgba(34,228,255,.15)}
+
+.btn{position:relative;overflow:hidden;display:inline-flex;align-items:center;justify-content:center;gap:.5rem;cursor:pointer;border:0;font:700 .95rem 'Manrope',sans-serif;color:#051018;padding:.75rem 1.3rem;border-radius:14px;background:linear-gradient(135deg,var(--cyan),#7cf0ff);transition:all .3s ease-in-out;box-shadow:0 8px 24px -8px rgba(34,228,255,.6)}
+.btn:hover{transform:scale(1.05);box-shadow:0 10px 30px -6px rgba(34,228,255,.85)}
+.btn:active{transform:scale(.96)}
+.btn[disabled]{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
+.btn.purple{background:linear-gradient(135deg,var(--purple),#c084fc);color:#fff;box-shadow:0 8px 24px -8px rgba(168,85,247,.7)}
+.btn.ghost{background:rgba(148,163,184,.1);color:var(--text);box-shadow:none;border:1px solid var(--line)}
+.btn.ghost:hover{background:rgba(148,163,184,.18);box-shadow:none}
+.btn.green{background:linear-gradient(135deg,var(--green),#86ffb8)}
+.btn.pink{background:linear-gradient(135deg,var(--pink),#ff86b0);color:#fff}
+.ripple{position:absolute;border-radius:50%;background:rgba(255,255,255,.4);transform:scale(0);animation:rip .6s ease-out forwards;pointer-events:none}
+@keyframes rip{to{transform:scale(3.4);opacity:0}}
+
+.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:rgba(9,13,22,.72);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--line)}
+.nav .row{display:flex;align-items:center;gap:12px;height:62px}
+.logo{display:flex;align-items:center;gap:10px;font:700 1rem 'Unbounded',sans-serif;color:var(--text);text-decoration:none;white-space:nowrap}
+.logo span{background:linear-gradient(90deg,var(--cyan),var(--purple));-webkit-background-clip:text;background-clip:text;color:transparent}
+.navlinks a{color:var(--muted);text-decoration:none;font-weight:600;font-size:.92rem;padding:.4rem .75rem;border-radius:10px;transition:all .3s}
+.navlinks a:hover{color:var(--text);background:rgba(148,163,184,.12)}
+.hud{margin-left:auto;display:flex;align-items:center;gap:10px;font-size:.82rem}
+.xpbar{width:90px;height:9px;border-radius:99px;background:rgba(148,163,184,.18);overflow:hidden}
+.xpbar i{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,var(--green),var(--cyan));box-shadow:0 0 12px var(--green);transition:width .7s cubic-bezier(.2,.9,.3,1.2)}
+.hud.pulse{animation:pulse .6s}
+@keyframes pulse{40%{transform:scale(1.08)}}
+.iconbtn{width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:rgba(148,163,184,.08);color:var(--text);cursor:pointer;font-size:1.05rem;transition:all .3s}
+.iconbtn:hover{transform:scale(1.1);border-color:var(--cyan)}
+
+.hero{position:relative;min-height:calc(100vh - 62px);display:flex;align-items:center;overflow:hidden;padding:48px 0 70px}
+#heroCanvas{position:absolute;inset:0;width:100%;height:100%;z-index:0}
+.hero .wrap{position:relative;z-index:2;display:grid;gap:30px;align-items:center}
+@media(min-width:900px){.hero .wrap{grid-template-columns:1.15fr .85fr}}
+.h-title{font-size:clamp(2.6rem,8vw,5.4rem);font-weight:900;letter-spacing:-.03em;background:linear-gradient(100deg,#fff 10%,var(--cyan) 50%,var(--purple) 95%);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 28px rgba(34,228,255,.25))}
+.h-title:hover{animation:glitch .4s steps(2) 1}
+@keyframes glitch{25%{transform:translate(2px,-1px);text-shadow:-3px 0 var(--pink),3px 0 var(--cyan)}75%{transform:translate(-2px,1px);text-shadow:3px 0 var(--pink),-3px 0 var(--cyan)}}
+.typed{font:500 clamp(1rem,2.6vw,1.35rem) 'JetBrains Mono',ui-monospace,monospace;color:var(--green);min-height:2.2em}
+.caret{display:inline-block;width:.6ch;height:1.1em;background:var(--green);vertical-align:-.15em;margin-left:2px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.pill{display:inline-flex;align-items:center;gap:.4rem;font-size:.85rem;padding:.35rem .8rem;border-radius:99px;border:1px solid var(--line);background:rgba(15,23,42,.6);color:var(--muted)}
+.stage{position:relative;aspect-ratio:1;width:min(420px,88vw);margin:0 auto;perspective:900px}
+.tilt{position:absolute;inset:0;transform:rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));transition:transform .15s ease-out;transform-style:preserve-3d}
+.halo{position:absolute;inset:8%;border-radius:50%;border:1px dashed rgba(34,228,255,.35);animation:spin 40s linear infinite}
+.halo.b{inset:20%;border-color:rgba(168,85,247,.4);animation-direction:reverse;animation-duration:28s}
+@keyframes spin{to{transform:rotate(360deg)}}
+.orbit{position:absolute;inset:0;animation:spin 26s linear infinite}
+.orbit .chip{position:absolute;width:56px;height:56px;display:grid;place-items:center;font-size:1.6rem;border-radius:18px;background:rgba(15,23,42,.8);border:1px solid var(--line);box-shadow:0 0 24px -4px var(--c,var(--cyan));animation:spin 26s linear infinite reverse;cursor:pointer;transition:filter .3s}
+.orbit .chip:hover{filter:brightness(1.5)}
+.heroShield{position:absolute;inset:18%;filter:drop-shadow(0 0 30px rgba(34,228,255,.55));animation:bob 5s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-10px)}}
+.scan{animation:scan 3s ease-in-out infinite}
+@keyframes scan{0%,100%{transform:translateY(0);opacity:.0}10%{opacity:.9}50%{transform:translateY(130px)}90%{opacity:.9}}
+
+.zone{padding:84px 0 20px}
+.zone-head{display:flex;gap:16px;align-items:center;margin-bottom:26px}
+.zone-ico{flex:none;width:58px;height:58px;border-radius:18px;display:grid;place-items:center;font-size:1.8rem;background:rgba(34,228,255,.1);border:1px solid rgba(34,228,255,.4);box-shadow:0 0 24px -6px var(--cyan)}
+.zone-head h2{font-size:clamp(1.15rem,3.4vw,1.85rem);font-weight:700}
+.zone-head p{margin:.35rem 0 0;color:var(--muted);max-width:62ch}
+.p6{padding:24px}
+.map-card{display:block;text-decoration:none;color:inherit;padding:20px;cursor:pointer}
+.map-card .ic{font-size:2rem}
+.status{display:inline-block;margin-top:10px;font-size:.78rem;padding:.2rem .6rem;border-radius:99px;background:rgba(148,163,184,.12);color:var(--muted)}
+.status.done{background:rgba(57,255,136,.14);color:var(--green)}
+
+.byte{width:min(260px,70%);display:block;margin:6px auto 0;animation:bob 4.5s ease-in-out infinite;filter:drop-shadow(0 0 26px rgba(168,85,247,.45));cursor:pointer}
+.byte .e,.byte .m,.byte .x{display:none}
+.byte[data-mood=idle] .e-open,.byte[data-mood=idle] .m-smile,.byte[data-mood=idle] .cheeks{display:inline}
+.byte[data-mood=meh] .e-open,.byte[data-mood=meh] .m-flat,.byte[data-mood=meh] .sweat{display:inline}
+.byte[data-mood=happy] .e-happy,.byte[data-mood=happy] .m-grin,.byte[data-mood=happy] .cheeks,.byte[data-mood=happy] .sparkles,
+.byte[data-mood=legend] .e-happy,.byte[data-mood=legend] .m-grin,.byte[data-mood=legend] .cheeks,.byte[data-mood=legend] .sparkles,.byte[data-mood=legend] .crown{display:inline}
+.byte[data-mood=sad] .e-sad,.byte[data-mood=sad] .m-frown,.byte[data-mood=sad] .tears{display:inline}
+.byte[data-mood=dizzy] .e-dizzy,.byte[data-mood=dizzy] .m-wavy,.byte[data-mood=dizzy] .stars{display:inline}
+.byte.pop{animation:popin .5s cubic-bezier(.2,1.6,.4,1)}
+@keyframes popin{0%{transform:scale(.85) rotate(-4deg)}100%{transform:scale(1)}}
+.byte .tear{animation:tear 1.3s ease-in infinite}
+@keyframes tear{0%{transform:translateY(0);opacity:1}100%{transform:translateY(26px);opacity:0}}
+.byte .stars{transform-origin:100px 26px;animation:spin 1.8s linear infinite}
+.byte .sp{animation:twinkle 1.2s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+.byte .sp:nth-child(2){animation-delay:.4s}.byte .sp:nth-child(3){animation-delay:.8s}
+@keyframes twinkle{50%{transform:scale(1.5);opacity:.4}}
+.byte.spin{animation:flip 1s ease-in-out}
+@keyframes flip{to{transform:rotate(720deg) scale(1)}}
+.bubble{position:relative;background:rgba(34,228,255,.1);border:1px solid rgba(34,228,255,.35);padding:12px 16px;border-radius:16px;text-align:center;font-weight:600;min-height:3.4em;display:grid;place-items:center}
+.bubble::after{content:"";position:absolute;bottom:-9px;left:50%;width:16px;height:16px;background:#0f2538;border-right:1px solid rgba(34,228,255,.35);border-bottom:1px solid rgba(34,228,255,.35);transform:translateX(-50%) rotate(45deg)}
+
+.pwwrap{position:relative}
+.pwwrap input{width:100%;font:500 1.15rem 'JetBrains Mono',monospace;color:var(--text);background:rgba(9,13,22,.8);border:2px solid var(--line);border-radius:14px;padding:.9rem 3.2rem .9rem 1rem;transition:all .3s;outline:none}
+.pwwrap input:focus{border-color:var(--cyan);box-shadow:0 0 0 4px rgba(34,228,255,.15)}
+.pwwrap button{position:absolute;right:8px;top:50%;transform:translateY(-50%)}
+.meter{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:16px 0 8px}
+.meter i{height:10px;border-radius:99px;background:rgba(148,163,184,.18);transition:all .4s cubic-bezier(.2,.9,.3,1.3)}
+.meter i.on{background:var(--mc);box-shadow:0 0 14px var(--mc);transform:scaleY(1.25)}
+.checks{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:14px 0}
+.checks li{list-style:none;font-size:.88rem;color:var(--muted);display:flex;gap:8px;align-items:center;transition:all .3s}
+.checks li b{display:grid;place-items:center;width:20px;height:20px;border-radius:50%;background:rgba(148,163,184,.15);font-size:.7rem;transition:all .3s;flex:none}
+.checks li.ok{color:var(--text)}
+.checks li.ok b{background:var(--green);color:#04210f;transform:scale(1.15) rotate(360deg)}
+.crack{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;background:rgba(9,13,22,.7);border:1px dashed var(--line)}
+.crack strong{font-family:'Unbounded',sans-serif;font-size:.95rem}
+
+.pcard{border-radius:20px;border:1px solid var(--line);background:rgba(9,13,22,.75);overflow:hidden;transition:all .3s}
+.pcard.good{border-color:var(--green);box-shadow:0 0 34px -6px var(--green)}
+.pcard.bad{border-color:var(--pink);box-shadow:0 0 34px -6px var(--pink);animation:shake .45s}
+@keyframes shake{20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+.pbar{display:flex;align-items:center;gap:8px;padding:10px 16px;border-bottom:1px solid var(--line);font-size:.82rem;color:var(--muted);background:rgba(148,163,184,.06)}
+.pbody{padding:18px 20px}
+.avatar{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;font-weight:700;background:linear-gradient(135deg,var(--purple),var(--cyan));color:#fff;flex:none}
+.linkbtn{display:inline-flex;margin-top:12px;padding:.6rem 1rem;border-radius:10px;background:#2563eb;color:#fff;font-weight:700;cursor:pointer;border:0;font-family:inherit}
+.linkbtn:hover{filter:brightness(1.15)}
+.urlprev{font:500 .8rem 'JetBrains Mono',monospace;color:var(--muted);margin-top:8px;word-break:break-all}
+mark.sus{background:transparent;color:inherit;border-radius:4px}
+.pcard.scan mark.sus{background:rgba(255,210,63,.22);outline:2px solid var(--yellow);animation:susp 1s ease-in-out infinite}
+@keyframes susp{50%{background:rgba(255,77,141,.3);outline-color:var(--pink)}}
+.fb{margin-top:14px;padding:14px 16px;border-radius:14px;animation:slideup .4s ease-out}
+.fb.good{background:rgba(57,255,136,.1);border:1px solid rgba(57,255,136,.4)}
+.fb.bad{background:rgba(255,77,141,.1);border:1px solid rgba(255,77,141,.4)}
+@keyframes slideup{from{opacity:0;transform:translateY(10px)}}
+.score{font:700 1.5rem 'Unbounded',sans-serif}
+.bump{animation:pulse .5s}
+.dots{display:flex;gap:6px}
+.dots i{flex:1;height:6px;border-radius:99px;background:rgba(148,163,184,.2);transition:all .4s}
+.dots i.ok{background:var(--green)}.dots i.no{background:var(--pink)}.dots i.cur{background:var(--cyan);animation:blink 1s infinite}
+
+.chips{display:grid;gap:8px}
+.chipt{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:.6rem .8rem;border-radius:14px;border:1px solid var(--line);background:rgba(148,163,184,.06);color:var(--muted);cursor:pointer;font:600 .9rem 'Manrope',sans-serif;transition:all .3s}
+.chipt:hover{transform:translateX(4px);border-color:rgba(34,228,255,.4)}
+.chipt.on{background:rgba(255,77,141,.12);border-color:rgba(255,77,141,.5);color:var(--text)}
+.chipt .sw{margin-left:auto;width:38px;height:22px;border-radius:99px;background:rgba(148,163,184,.25);position:relative;flex:none;transition:all .3s}
+.chipt .sw::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:all .3s cubic-bezier(.2,1.5,.4,1)}
+.chipt.on .sw{background:var(--pink)}.chipt.on .sw::after{left:19px}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:10px;border-radius:99px;background:linear-gradient(90deg,var(--green),var(--yellow),var(--pink));outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;border-radius:50%;background:#fff;border:4px solid var(--purple);cursor:grab;box-shadow:0 0 16px var(--purple);transition:transform .2s}
+input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2)}
+input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:#fff;border:4px solid var(--purple);cursor:grab}
+.exp{position:absolute;left:16px;top:14px;z-index:2;pointer-events:none}
+.exp .n{font:900 2.6rem 'Unbounded',sans-serif;line-height:1}
+
+.tabs{display:inline-flex;flex-wrap:wrap;padding:4px;border-radius:14px;background:rgba(148,163,184,.1);margin-bottom:18px;gap:4px}
+.tabs button{border:0;background:transparent;color:var(--muted);font:700 .9rem 'Manrope',sans-serif;padding:.55rem 1rem;border-radius:10px;cursor:pointer;transition:all .3s}
+.tabs button.on{background:linear-gradient(135deg,var(--purple),var(--cyan));color:#fff}
+.chat{display:flex;gap:10px;align-items:flex-end;margin:12px 0 18px}
+.chat .bub{background:rgba(148,163,184,.14);padding:12px 16px;border-radius:18px 18px 18px 4px;max-width:92%}
+.chat .who{font-size:.78rem;color:var(--muted);margin-bottom:2px}
+.opt{display:block;width:100%;text-align:left;margin-top:10px;padding:.85rem 1rem;border-radius:14px;border:1px solid var(--line);background:rgba(148,163,184,.06);color:var(--text);font:600 .95rem 'Manrope',sans-serif;cursor:pointer;transition:all .3s}
+.opt:hover:not([disabled]){transform:translateX(6px);border-color:var(--cyan);background:rgba(34,228,255,.08)}
+.opt.right{border-color:var(--green);background:rgba(57,255,136,.14);animation:glowg .8s}
+.opt.wrong{border-color:var(--pink);background:rgba(255,77,141,.14);animation:shake .45s}
+@keyframes glowg{50%{box-shadow:0 0 30px var(--green)}}
+.phone{max-width:420px;margin:0 auto;border-radius:34px;border:6px solid #1e293b;background:#0b1120;padding:16px;box-shadow:0 20px 60px -20px rgba(168,85,247,.5)}
+.set{display:flex;gap:12px;align-items:center;padding:12px;border-radius:14px;border:1px solid transparent;transition:all .3s}
+.set+.set{margin-top:6px}
+.set.right{border-color:rgba(57,255,136,.5);background:rgba(57,255,136,.08)}
+.set.wrong{border-color:rgba(255,77,141,.6);background:rgba(255,77,141,.08);animation:shake .45s}
+.set small{display:block;color:var(--muted);line-height:1.3}
+.tog{margin-left:auto;flex:none;width:48px;height:28px;border-radius:99px;background:rgba(148,163,184,.3);border:0;position:relative;cursor:pointer;transition:all .3s}
+.tog::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:all .3s cubic-bezier(.2,1.5,.4,1)}
+.tog[aria-checked=true]{background:var(--cyan)}.tog[aria-checked=true]::after{left:23px}
+
+.badges{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px}
+.badge{text-align:center;padding:18px 10px;border-radius:18px;border:1px dashed var(--line);filter:grayscale(1);opacity:.5;transition:all .5s}
+.badge .b{font-size:2.4rem;display:block}
+.badge.got{filter:none;opacity:1;border:1px solid var(--yellow);box-shadow:0 0 28px -6px var(--yellow);animation:popin .6s}
+.cert{border-radius:22px;padding:28px;text-align:center;border:2px solid var(--yellow);background:linear-gradient(135deg,rgba(255,210,63,.1),rgba(168,85,247,.15));animation:popin .7s}
+input.txt{font:500 1rem 'Manrope',sans-serif;color:var(--text);background:rgba(9,13,22,.8);border:2px solid var(--line);border-radius:12px;padding:.7rem 1rem;outline:none;min-width:0}
+input.txt:focus{border-color:var(--cyan)}
+
+.tipfab{position:fixed;right:18px;bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:60}
+.tipfab>button{width:58px;height:58px;border-radius:50%;border:0;font-size:1.6rem;cursor:pointer;background:linear-gradient(135deg,var(--yellow),#ffb347);box-shadow:0 0 30px -4px var(--yellow);transition:all .3s;position:relative}
+.tipfab>button:hover{transform:scale(1.12) rotate(-8deg)}
+.tipfab .dot{position:absolute;top:2px;right:2px;width:14px;height:14px;border-radius:50%;background:var(--pink);border:2px solid #090d16;animation:blink 1.4s infinite}
+.tippanel{position:absolute;right:0;bottom:72px;width:min(330px,calc(100vw - 36px));padding:18px;transform-origin:bottom right;transform:scale(.6);opacity:0;pointer-events:none;transition:all .35s cubic-bezier(.2,1.4,.4,1);background:rgba(15,23,42,.92)}
+.tippanel.open{transform:scale(1);opacity:1;pointer-events:auto}
+#toasts{position:fixed;z-index:80;left:50%;transform:translateX(-50%);top:calc(74px + env(safe-area-inset-top,0px));display:grid;gap:8px;pointer-events:none;width:max-content;max-width:92vw}
+.toast{padding:.6rem 1rem;border-radius:14px;background:rgba(15,23,42,.94);border:1px solid var(--line);font-weight:700;font-size:.92rem;animation:toastin .4s cubic-bezier(.2,1.5,.4,1),toastout .4s ease-in 2.4s forwards;box-shadow:0 10px 30px -8px #000}
+.toast.xp{border-color:var(--green);color:var(--green)}.toast.warn{border-color:var(--yellow);color:var(--yellow)}.toast.lvl{border-color:var(--purple);color:#e9d5ff;font-size:1.05rem}
+@keyframes toastin{from{opacity:0;transform:translateY(-14px) scale(.8)}}
+@keyframes toastout{to{opacity:0;transform:translateY(-10px)}}
+#matrix{position:fixed;inset:0;z-index:90;pointer-events:none;width:100%;height:100%}
+footer{padding:50px 0 90px;text-align:center;color:var(--muted);font-size:.9rem}
+@media(max-width:640px){.checks{grid-template-columns:1fr}.hud .lvn{display:none}.xpbar{width:64px}.logo b{display:none}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div id="toasts" aria-live="polite"></div>
+<canvas id="matrix" aria-hidden="true"></canvas>
+
+<header class="nav">
+  <div class="wrap row">
+    <a href="#top" class="logo" id="logo">
+      <svg width="30" height="30" viewBox="0 0 24 24" fill="none"><path d="M12 2l8 3v6c0 5-3.4 8.6-8 11-4.6-2.4-8-6-8-11V5l8-3z" fill="url(#lg)" /><path d="M8.5 12l2.5 2.5L15.5 10" stroke="#051018" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#22e4ff"/><stop offset="1" stop-color="#a855f7"/></linearGradient></defs></svg>
+      <b>SafeNet <span>Quest</span></b>
+    </a>
+    <nav class="navlinks hidden md:flex ml-3" aria-label="Зони">
+      <a href="#zone-password">Паролі</a><a href="#zone-phish">Фішинг</a><a href="#zone-footprint">Цифровий слід</a><a href="#zone-quiz">Лабораторія</a>
+    </nav>
+    <div class="hud" id="hud" title="Твій досвід (XP)">
+      <span class="lvn" id="lvlName" style="color:var(--muted)">Новачок</span>
+      <b id="lvlNum" style="color:var(--cyan)">Рів. 1</b>
+      <div class="xpbar"><i id="xpFill"></i></div>
+      <span id="xpNum" style="min-width:3.6ch">0 XP</span>
+    </div>
+    <button class="iconbtn" id="soundBtn" aria-pressed="false" aria-label="Увімкнути або вимкнути звукові ефекти" title="Звукові ефекти">🔇</button>
+  </div>
+</header>
+
+<main id="top">
+<!-- HERO -->
+<section class="hero">
+  <canvas id="heroCanvas" aria-hidden="true"></canvas>
+  <div class="wrap">
+    <div>
+      <span class="pill">🛡️ 10-хвилинний квест для підлітків, які живуть в інтернеті</span>
+      <h1 class="h-title" style="margin:18px 0 14px">SafeNet Quest</h1>
+      <p class="typed" aria-live="off"><span id="typed"></span><span class="caret"></span></p>
+      <p style="color:var(--muted);max-width:52ch;margin:10px 0 26px;font-size:1.05rem">Пройди чотири міні-ігри, збирай XP та значки й дізнайся, що насправді захищає твої акаунти, фото та особисті дані. Без нудних лекцій. Обіцяємо.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:12px">
+        <a class="btn" href="#zone-password">Почати квест 🚀</a>
+        <a class="btn ghost" href="#map">Дивитися карту квесту</a>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:26px">
+        <span class="pill">🎮 4 зони</span><span class="pill">⏱️ близько 10 хвилин</span><span class="pill">🔒 Дані не покидають твій пристрій</span>
+      </div>
+    </div>
+    <div class="stage" id="stage" aria-hidden="true">
+      <div class="tilt" id="tilt">
+        <div class="halo"></div><div class="halo b"></div>
+        <div class="orbit">
+          <div class="chip" style="top:0;left:50%;margin-left:-28px;--c:var(--cyan)" data-say="🔑 Довгий пароль переможе хитрий.">🔑</div>
+          <div class="chip" style="top:50%;right:0;margin-top:-28px;--c:var(--pink)" data-say="🎣 Якщо повідомлення вимагає поспіху, це, імовірно, наживка.">🎣</div>
+          <div class="chip" style="bottom:0;left:50%;margin-left:-28px;--c:var(--purple)" data-say="👁️ Твої дані мають довгу пам’ять.">👁️</div>
+          <div class="chip" style="top:50%;left:0;margin-top:-28px;--c:var(--green)" data-say="🧠 Ти — найкращий файрвол.">🧠</div>
+        </div>
+        <svg class="heroShield" viewBox="0 0 200 230">
+          <defs><linearGradient id="hs" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#22e4ff"/><stop offset="1" stop-color="#a855f7"/></linearGradient>
+          <clipPath id="sc"><path d="M100 8 L182 40 V112 C182 162 146 198 100 220 C54 198 18 162 18 112 V40 Z"/></clipPath></defs>
+          <path d="M100 8 L182 40 V112 C182 162 146 198 100 220 C54 198 18 162 18 112 V40 Z" fill="rgba(9,13,22,.85)" stroke="url(#hs)" stroke-width="6"/>
+          <g clip-path="url(#sc)"><rect class="scan" x="10" y="40" width="180" height="6" fill="#22e4ff" opacity=".8"/></g>
+          <circle cx="100" cy="98" r="22" fill="none" stroke="url(#hs)" stroke-width="8"/>
+          <path d="M100 118 V160" stroke="url(#hs)" stroke-width="10" stroke-linecap="round"/>
+          <path d="M100 140 h16" stroke="url(#hs)" stroke-width="8" stroke-linecap="round"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MAP -->
+<section id="map" style="padding:40px 0 0">
+  <div class="wrap">
+    <h2 style="font-size:clamp(1.15rem,3.2vw,1.7rem);margin-bottom:18px">Обери першу зону</h2>
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <a class="glass lift map-card" href="#zone-password"><span class="ic">🔐</span><h3 style="font-size:.95rem;margin:8px 0 4px">Додзьо надійних паролів</h3><p style="margin:0;color:var(--muted);font-size:.92rem">Розвесели щит Байта.</p><span class="status" data-st="pw">Не розпочато</span></a>
+      <a class="glass lift map-card" href="#zone-phish"><span class="ic">🎣</span><h3 style="font-size:.95rem;margin:8px 0 4px">Помічай фішинг</h3><p style="margin:0;color:var(--muted);font-size:.92rem">Справжнє чи підробка? 8 повідомлень.</p><span class="status" data-st="phish">Не розпочато</span></a>
+      <a class="glass lift map-card" href="#zone-footprint"><span class="ic">👣</span><h3 style="font-size:.95rem;margin:8px 0 4px">Цифровий слід</h3><p style="margin:0;color:var(--muted);font-size:.92rem">Подивись, як розходяться твої дані.</p><span class="status" data-st="foot">Не розпочато</span></a>
+      <a class="glass lift map-card" href="#zone-quiz"><span class="ic">🧠</span><h3 style="font-size:.95rem;margin:8px 0 4px">Лабораторія шахраїв</h3><p style="margin:0;color:var(--muted);font-size:.92rem">Сценарії й аудит налаштувань.</p><span class="status" data-st="quiz">Не розпочато</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ZONE 1 -->
+<section id="zone-password" class="zone">
+  <div class="wrap">
+    <div class="zone-head"><div class="zone-ico">🔐</div><div><h2>Додзьо надійних паролів</h2><p>Введи пароль і дивись, як реагує Байт. Усе перевіряється прямо у твоєму браузері, але справжній пароль усе одно не вводь.</p></div></div>
+    <div class="grid lg:grid-cols-2 gap-6">
+      <div class="glass p6">
+        <div class="bubble" id="pwBubble">Привіт, я Байт! Введи пароль і стеж за моїм обличчям. 👀</div>
+        <svg id="byte" class="byte" viewBox="0 -30 200 262" data-mood="idle" role="img" aria-label="Байт, щит-талісман">
+          <defs><linearGradient id="bg1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#22e4ff"/><stop offset="1" stop-color="#a855f7"/></linearGradient></defs>
+          <g class="x crown"><path d="M72 14 L72 -8 L86 4 L100 -18 L114 4 L128 -8 L128 14 Z" fill="#ffd23f" stroke="#ff9f1a" stroke-width="3" stroke-linejoin="round"/></g>
+          <path d="M100 10 L178 40 V110 C178 160 145 195 100 214 C55 195 22 160 22 110 V40 Z" fill="url(#bg1)"/>
+          <path d="M100 10 L178 40 V110 C178 160 145 195 100 214 C55 195 22 160 22 110 V40 Z" fill="#0b1224" opacity=".92" transform="translate(100 112) scale(.86) translate(-100 -112)"/>
+          <g class="x cheeks"><circle cx="54" cy="135" r="10" fill="#ff4d8d" opacity=".35"/><circle cx="146" cy="135" r="10" fill="#ff4d8d" opacity=".35"/></g>
+          <g class="e e-open"><circle cx="72" cy="108" r="13" fill="#e8fbff"/><circle cx="128" cy="108" r="13" fill="#e8fbff"/><g id="pupils"><circle cx="72" cy="108" r="6" fill="#0b1224"/><circle cx="128" cy="108" r="6" fill="#0b1224"/></g></g>
+          <g class="e e-happy" fill="none" stroke="#39ff88" stroke-width="6" stroke-linecap="round"><path d="M58 114 Q72 94 86 114"/><path d="M114 114 Q128 94 142 114"/></g>
+          <g class="e e-sad"><circle cx="72" cy="110" r="13" fill="#e8fbff"/><circle cx="128" cy="110" r="13" fill="#e8fbff"/><circle cx="72" cy="114" r="6" fill="#0b1224"/><circle cx="128" cy="114" r="6" fill="#0b1224"/><path d="M56 90 L86 98 M144 90 L114 98" stroke="#ff4d8d" stroke-width="5" stroke-linecap="round"/></g>
+          <g class="e e-dizzy" stroke="#ff4d8d" stroke-width="6" stroke-linecap="round"><path d="M60 96 l24 24 M84 96 l-24 24 M116 96 l24 24 M140 96 l-24 24"/></g>
+          <path class="m m-smile" d="M76 148 Q100 172 124 148" fill="none" stroke="#39ff88" stroke-width="6" stroke-linecap="round"/>
+          <path class="m m-grin" d="M70 142 Q100 192 130 142 Z" fill="#ff4d8d" stroke="#39ff88" stroke-width="5" stroke-linejoin="round"/>
+          <path class="m m-flat" d="M80 158 H120" stroke="#ffd23f" stroke-width="6" stroke-linecap="round"/>
+          <path class="m m-frown" d="M78 168 Q100 144 122 168" fill="none" stroke="#ff4d8d" stroke-width="6" stroke-linecap="round"/>
+          <path class="m m-wavy" d="M74 160 q6 -10 13 0 t13 0 t13 0 t13 0" fill="none" stroke="#ff4d8d" stroke-width="5" stroke-linecap="round"/>
+          <g class="x tears"><path class="tear" d="M70 126 q-6 10 0 14 q6 -4 0 -14z" fill="#22e4ff"/><path class="tear" style="animation-delay:.5s" d="M130 126 q-6 10 0 14 q6 -4 0 -14z" fill="#22e4ff"/></g>
+          <g class="x sweat"><path d="M152 76 q-8 14 0 20 q8 -6 0 -20z" fill="#22e4ff"/></g>
+          <g class="x sparkles" fill="#ffd23f" font-size="20"><text class="sp" x="14" y="60">✦</text><text class="sp" x="170" y="80">✦</text><text class="sp" x="160" y="26">✦</text></g>
+          <g class="x stars" fill="#ffd23f" font-size="20" text-anchor="middle"><text x="58" y="26">★</text><text x="142" y="26">★</text><text x="100" y="-2">★</text></g>
+        </svg>
+      </div>
+      <div class="glass p6">
+        <label for="pw" style="font-weight:700">Спробуй пароль</label>
+        <div class="pwwrap" style="margin-top:8px">
+          <input id="pw" type="password" placeholder="пиши тут…" autocomplete="off" spellcheck="false" maxlength="64">
+          <button class="iconbtn" id="pwEye" type="button" aria-label="Показати або сховати пароль">👁️</button>
+        </div>
+        <div class="meter" id="meter"><i></i><i></i><i></i><i></i><i></i></div>
+        <div style="display:flex;justify-content:space-between;font-weight:700"><span id="pwLabel" style="color:var(--muted)">Чекаю на тебе…</span><span id="pwBits" style="color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:.85rem"></span></div>
+        <ul class="checks" id="checks" style="padding:0">
+          <li data-k="len"><b>✓</b>12+ символів</li><li data-k="up"><b>✓</b>Велика літера</li>
+          <li data-k="low"><b>✓</b>Мала літера</li><li data-k="num"><b>✓</b>Цифра</li>
+          <li data-k="sym"><b>✓</b>Спецсимвол</li><li data-k="com"><b>✓</b>Не поширений пароль</li>
+          <li data-k="rep"><b>✓</b>Без повторів на кшталт aaa</li><li data-k="seq"><b>✓</b>Без рядів 123 чи qwe</li>
+        </ul>
+        <div class="crack"><span style="font-size:1.6rem">⏱️</span><div><div style="color:var(--muted);font-size:.82rem">Швидкій системі для злому знадобиться</div><strong id="crack">…</strong></div></div>
+        <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:16px">
+          <button class="btn purple" id="gen" type="button">✨ Створити парольну фразу</button>
+          <button class="btn ghost" id="clr" type="button">Очистити</button>
+        </div>
+        <p style="color:var(--muted);font-size:.88rem;margin:14px 0 0">Порада профі: чотири випадкові слова легше запам’ятати й важче зламати, ніж <i>P@ssw0rd!</i></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ZONE 2 -->
+<section id="zone-phish" class="zone">
+  <div class="wrap">
+    <div class="zone-head"><div class="zone-ico" style="border-color:rgba(255,77,141,.5);background:rgba(255,77,141,.1);box-shadow:0 0 24px -6px var(--pink)">🎣</div><div><h2>Виклик: помічай фішинг</h2><p>Вісім повідомлень. Вирішуй: наживка це чи справжнє. Маєш 3 сканування червоних прапорців, але вони коштують балів.</p></div></div>
+    <div class="glass p6" id="phishBox">
+      <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <div><div style="color:var(--muted);font-size:.8rem">Рахунок</div><div class="score" id="pScore">0</div></div>
+        <div><div style="color:var(--muted);font-size:.8rem">Серія</div><div class="score" id="pStreak">🔥 0</div></div>
+        <div><div style="color:var(--muted);font-size:.8rem">Сканувань лишилось</div><div class="score" id="pScans">3</div></div>
+      </div>
+      <div class="dots" id="pDots" style="margin-bottom:16px"></div>
+      <div id="pStage"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ZONE 3 -->
+<section id="zone-footprint" class="zone">
+  <div class="wrap">
+    <div class="zone-head"><div class="zone-ico" style="border-color:rgba(168,85,247,.55);background:rgba(168,85,247,.12);box-shadow:0 0 24px -6px var(--purple)">👣</div><div><h2>Візуалізатор цифрового сліду</h2><p>Вмикай і вимикай звички та дивись, хто може тебе бачити. <b style="color:var(--yellow)">Місія:</b> знизити експозицію до 30 або менше, не зникаючи з інтернету.</p></div></div>
+    <div class="grid lg:grid-cols-[1.35fr_1fr] gap-6">
+      <div class="glass" style="position:relative;overflow:hidden">
+        <div class="exp"><div style="color:var(--muted);font-size:.8rem">Експозиція</div><div class="n" id="expNum">0</div><div id="expLbl" style="font-weight:700"></div></div>
+        <canvas id="fpCanvas" style="width:100%;height:470px;display:block" role="img" aria-label="Мережевий графік: хто може бачити твої дані"></canvas>
+        <div style="padding:0 18px 16px;display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center">
+          <span style="color:var(--muted);font-size:.9rem">Потенційних глядачів: <b id="reach" style="color:var(--text)">0</b></span>
+          <div style="display:flex;gap:8px"><button class="btn ghost" id="delPost" type="button">🗑️ Видалити допис</button><button class="btn ghost" id="fpReset" type="button">↺ Скинути</button></div>
+        </div>
+      </div>
+      <div class="glass p6">
+        <label for="aud" style="font-weight:700">Хто бачить твої дописи?</label>
+        <input id="aud" type="range" min="0" max="3" step="1" value="3" style="margin:14px 0 6px">
+        <div style="display:flex;justify-content:space-between;gap:4px;font-size:.74rem;color:var(--muted)"><span>Близькі друзі</span><span>Друзі</span><span>Друзі друзів</span><span>Усі</span></div>
+        <div style="font-weight:700;margin:18px 0 10px">Твої звички</div>
+        <div class="chips" id="fpChips"></div>
+        <div id="fpAdvice" class="fb bad" style="margin-top:16px"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ZONE 4 -->
+<section id="zone-quiz" class="zone">
+  <div class="wrap">
+    <div class="zone-head"><div class="zone-ico" style="border-color:rgba(255,210,63,.55);background:rgba(255,210,63,.1);box-shadow:0 0 24px -6px var(--yellow)">🧠</div><div><h2>Соціальна інженерія та приватність</h2><p>Шахраї зламують людей, а не комп’ютери. Переживи шість підозрілих ситуацій, а потім закрий усі дірки в налаштуваннях.</p></div></div>
+    <div class="glass p6">
+      <div class="tabs" role="tablist"><button class="on" id="tabQ" role="tab">Сценарії</button><button id="tabL" role="tab">Лабораторія налаштувань</button></div>
+      <div id="quizPane"></div>
+      <div id="labPane" style="display:none"></div>
+    </div>
+  </div>
+</section>
+
+<!-- FINALE -->
+<section id="finale" class="zone" style="padding-bottom:30px">
+  <div class="wrap">
+    <div class="zone-head"><div class="zone-ico">🏆</div><div><h2>Твоя вітрина трофеїв</h2><p id="finaleSub">Пройди всі чотири зони, щоб стати Кібергероєм.</p></div></div>
+    <div class="glass p6">
+      <div class="badges" id="badges"></div>
+      <div style="margin-top:22px;display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+        <input class="txt" id="certName" placeholder="Твоє ім’я або псевдонім героя" maxlength="24" aria-label="Ім’я для сертифіката">
+        <button class="btn purple" id="certBtn" type="button" disabled>🎓 Отримати сертифікат</button>
+      </div>
+      <div id="certOut" style="margin-top:18px"></div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p style="margin:0">Створено для допитливих підлітків. Якщо щось в інтернеті здається тобі неправильним, поговори з кимось, кому довіряєш. 💙</p>
+    <p style="margin:8px 0 0;font-size:.8rem;opacity:.7">Тссс… тут заховано кілька секретів. Спробуй торкнутися Байта або ввести старий добрий чіт-код.</p>
+  </div>
+</footer>
+
+<div class="tipfab">
+  <div class="glass tippanel" id="tipPanel" role="dialog" aria-label="Кіберпорада дня">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><b style="font-family:Unbounded,sans-serif;font-size:.85rem">💡 Кіберпорада дня</b><button class="iconbtn" id="tipX" style="width:32px;height:32px;font-size:.9rem" aria-label="Закрити пораду">✕</button></div>
+    <p id="tipText" style="margin:0 0 14px"></p>
+    <button class="btn ghost" id="tipNext" type="button" style="padding:.5rem .9rem">Ще порада 🎲</button>
+  </div>
+  <button id="tipBtn" aria-label="Відкрити кіберпораду дня" aria-expanded="false">💡<span class="dot" id="tipDot"></span></button>
+</div>
+
+<script>
+(() => {
+'use strict';
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const rnd = n => { const a = new Uint32Array(1); crypto.getRandomValues(a); return a[0] % n; };
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = rnd(i + 1); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+/* українська множина: pl(5,['рік','роки','років']) */
+const pl = (n, f) => { const m = n % 100, d = n % 10; return m > 10 && m < 20 ? f[2] : d === 1 ? f[0] : d > 1 && d < 5 ? f[1] : f[2]; };
+
+/* ---------- state ---------- */
+const S = { xp: 0, done: {}, best: {}, parts: {} };
+try { Object.assign(S, JSON.parse(localStorage.getItem('snq-uk') || '{}')); } catch (e) {}
+const save = () => { try { localStorage.setItem('snq-uk', JSON.stringify(S)); } catch (e) {} };
+
+/* ---------- sound ---------- */
+let actx = null, soundOn = false;
+function tone(f, d = .1, type = 'sine', v = .05, delay = 0) {
+  if (!soundOn) return;
+  try {
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    const t = actx.currentTime + delay, o = actx.createOscillator(), g = actx.createGain();
+    o.type = type; o.frequency.setValueAtTime(f, t);
+    g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(.0001, t + d);
+    o.connect(g); g.connect(actx.destination); o.start(t); o.stop(t + d + .02);
+  } catch (e) {}
+}
+const sfx = {
+  click: () => tone(520, .06, 'triangle'),
+  good: () => { tone(660, .1); tone(880, .15, 'sine', .05, .09); },
+  bad: () => { tone(200, .18, 'sawtooth', .035); tone(150, .24, 'sawtooth', .035, .1); },
+  win: () => [523, 659, 784, 1047, 1319].forEach((f, i) => tone(f, .2, 'triangle', .05, i * .09)),
+  xp: () => tone(988, .08, 'square', .02)
+};
+$('#soundBtn').onclick = e => {
+  soundOn = !soundOn; e.currentTarget.textContent = soundOn ? '🔊' : '🔇';
+  e.currentTarget.setAttribute('aria-pressed', soundOn); if (soundOn) sfx.good();
+  toast(soundOn ? 'Звукові ефекти увімкнено' : 'Звукові ефекти вимкнено');
+};
+
+/* ---------- confetti / toast ---------- */
+const boom = (o = {}) => { if (window.confetti) confetti(Object.assign({ particleCount: 110, spread: 75, origin: { y: .7 }, colors: ['#22e4ff', '#a855f7', '#39ff88', '#ffd23f', '#ff4d8d'], disableForReducedMotion: true }, o)); };
+const fireworks = () => { boom({ particleCount: 140, origin: { x: .2, y: .6 } }); setTimeout(() => boom({ particleCount: 140, origin: { x: .8, y: .6 } }), 250); setTimeout(() => boom({ particleCount: 200, spread: 120, origin: { y: .5 } }), 550); };
+function toast(msg, kind = '') {
+  const t = document.createElement('div'); t.className = 'toast ' + kind; t.textContent = msg;
+  $('#toasts').appendChild(t); setTimeout(() => t.remove(), 2900);
+}
+
+/* ---------- XP / levels ---------- */
+const LV = [{ n: 'Новачок', x: 0 }, { n: 'Захисник', x: 40 }, { n: 'Вартовий', x: 110 }, { n: 'Страж', x: 180 }, { n: 'Кібергерой', x: 250 }];
+const lvlOf = xp => { let i = 0; LV.forEach((l, k) => { if (xp >= l.x) i = k; }); return i; };
+function hud() {
+  const i = lvlOf(S.xp), cur = LV[i], nxt = LV[i + 1];
+  $('#lvlName').textContent = cur.n; $('#lvlNum').textContent = 'Рів. ' + (i + 1); $('#xpNum').textContent = S.xp + ' XP';
+  $('#xpFill').style.width = (nxt ? (S.xp - cur.x) / (nxt.x - cur.x) * 100 : 100) + '%';
+}
+function addXP(n, why = '') {
+  if (n <= 0) return;
+  const before = lvlOf(S.xp); S.xp += n; save(); hud(); sfx.xp();
+  toast('+' + n + ' XP' + (why ? ' · ' + why : ''), 'xp');
+  const h = $('#hud'); h.classList.remove('pulse'); void h.offsetWidth; h.classList.add('pulse');
+  const after = lvlOf(S.xp);
+  if (after > before) setTimeout(() => { toast('Новий рівень! Тепер ти — ' + LV[after].n, 'lvl'); sfx.win(); boom({ particleCount: 70 }); }, 700);
+}
+
+/* ---------- modules / badges ---------- */
+const MODS = { pw: ['🔐', 'Майстер паролів'], phish: ['🎣', 'Мисливець на фішинг'], foot: ['👣', 'Ніндзя цифрового сліду'], quiz: ['🧠', 'Переможець шахраїв'] };
+function complete(k) {
+  if (S.done[k]) return false;
+  S.done[k] = true; save(); progress();
+  toast(MODS[k][0] + ' Значок розблоковано: ' + MODS[k][1], 'lvl'); sfx.win(); fireworks();
+  if (Object.keys(MODS).every(m => S.done[m])) setTimeout(() => { toast('Усі зони пройдено! Отримай сертифікат нижче 🏆', 'lvl'); }, 1400);
+  return true;
+}
+function progress() {
+  $$('[data-st]').forEach(el => { const d = S.done[el.dataset.st]; el.textContent = d ? 'Пройдено ✓' : 'Не розпочато'; el.classList.toggle('done', !!d); });
+  const all = Object.keys(MODS); const n = all.filter(k => S.done[k]).length;
+  $('#badges').innerHTML = all.map(k => `<div class="badge ${S.done[k] ? 'got' : ''}"><span class="b">${MODS[k][0]}</span><b>${MODS[k][1]}</b><div style="font-size:.78rem;color:var(--muted)">${S.done[k] ? 'Розблоковано' : 'Заблоковано'}</div></div>`).join('')
+    + `<div class="badge ${S.secret ? 'got' : ''}"><span class="b">🕹️</span><b>Олдскульний хакер</b><div style="font-size:.78rem;color:var(--muted)">${S.secret ? 'Розблоковано' : 'Секрет'}</div></div>`;
+  $('#finaleSub').textContent = n === 4 ? 'Усі зони пройдено. Ти офіційно Кібергерой.' : 'Пройдено зон: ' + n + ' з 4. Так тримати!';
+  $('#certBtn').disabled = n < 4;
+}
+S.secret = S.secret || false;
+
+/* ---------- global micro-interactions ---------- */
+document.addEventListener('pointerdown', e => {
+  const b = e.target.closest('.btn'); if (!b || b.disabled) return;
+  const r = b.getBoundingClientRect(), s = Math.max(r.width, r.height), sp = document.createElement('span');
+  sp.className = 'ripple'; sp.style.cssText = `width:${s}px;height:${s}px;left:${e.clientX - r.left - s / 2}px;top:${e.clientY - r.top - s / 2}px`;
+  b.appendChild(sp); setTimeout(() => sp.remove(), 650);
+});
+document.addEventListener('click', e => { if (e.target.closest('button,.btn,a.map-card,.chip')) sfx.click(); });
+
+/* ---------- hero: typing ---------- */
+(() => {
+  const lines = ['Помічай фішинг, поки він не клюнув.', 'Захищай паролі як профі.', 'Зменшуй свій цифровий слід.', 'Перехитри соціальних інженерів.', 'Прокачай свою інтернет-безпеку.'];
+  const el = $('#typed'); let li = 0, ci = 0, del = false;
+  if (reduce) { el.textContent = lines[0]; return; }
+  (function tick() {
+    const s = lines[li];
+    el.textContent = s.slice(0, ci);
+    if (!del && ci === s.length) { del = true; return setTimeout(tick, 1600); }
+    if (del && ci === 0) { del = false; li = (li + 1) % lines.length; return setTimeout(tick, 350); }
+    ci += del ? -1 : 1; setTimeout(tick, del ? 22 : 55);
+  })();
+})();
+
+/* ---------- hero: particles ---------- */
+(() => {
+  const c = $('#heroCanvas'), x = c.getContext('2d'); let W, H, P = [], vis = true, mx = -999, my = -999;
+  const dpr = Math.min(2, devicePixelRatio || 1);
+  function size() {
+    const r = c.getBoundingClientRect(); W = r.width; H = r.height; c.width = W * dpr; c.height = H * dpr; x.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const n = Math.round(Math.min(90, W / 14) * (reduce ? .4 : 1));
+    P = Array.from({ length: n }, () => ({ x: Math.random() * W, y: Math.random() * H, vx: (Math.random() - .5) * .5, vy: (Math.random() - .5) * .5, r: Math.random() * 2 + 1, p: Math.random() < .5 }));
+  }
+  size(); addEventListener('resize', size);
+  c.parentElement.addEventListener('pointermove', e => { const r = c.getBoundingClientRect(); mx = e.clientX - r.left; my = e.clientY - r.top; });
+  c.parentElement.addEventListener('pointerleave', () => { mx = my = -999; });
+  new IntersectionObserver(en => vis = en[0].isIntersecting).observe(c);
+  (function loop() {
+    requestAnimationFrame(loop); if (!vis) return;
+    x.clearRect(0, 0, W, H);
+    const cy = getComputedStyle(document.body).getPropertyValue('--cyan').trim() || '#22e4ff', pu = getComputedStyle(document.body).getPropertyValue('--purple').trim() || '#a855f7';
+    for (const p of P) {
+      const dx = p.x - mx, dy = p.y - my, d = Math.hypot(dx, dy);
+      if (d < 130) { p.x += dx / d * 1.4; p.y += dy / d * 1.4; }
+      p.x += p.vx; p.y += p.vy;
+      if (p.x < 0 || p.x > W) p.vx *= -1; if (p.y < 0 || p.y > H) p.vy *= -1;
+      x.beginPath(); x.arc(p.x, p.y, p.r, 0, 6.283); x.fillStyle = p.p ? pu : cy; x.globalAlpha = .85; x.fill();
+    }
+    for (let i = 0; i < P.length; i++) for (let j = i + 1; j < P.length; j++) {
+      const d = Math.hypot(P[i].x - P[j].x, P[i].y - P[j].y);
+      if (d < 120) { x.globalAlpha = (1 - d / 120) * .35; x.strokeStyle = cy; x.lineWidth = 1; x.beginPath(); x.moveTo(P[i].x, P[i].y); x.lineTo(P[j].x, P[j].y); x.stroke(); }
+    }
+    x.globalAlpha = 1;
+  })();
+  const st = $('#stage'), tl = $('#tilt');
+  $('.hero').addEventListener('pointermove', e => {
+    if (reduce) return; const r = st.getBoundingClientRect();
+    const px = (e.clientX - (r.left + r.width / 2)) / innerWidth, py = (e.clientY - (r.top + r.height / 2)) / innerHeight;
+    tl.style.setProperty('--ry', (px * 24) + 'deg'); tl.style.setProperty('--rx', (-py * 24) + 'deg');
+  });
+  $$('.chip').forEach(ch => ch.addEventListener('click', () => { toast(ch.dataset.say, 'warn'); boom({ particleCount: 30, spread: 50, origin: { x: .75, y: .4 } }); }));
+})();
+
+/* ---------- ZONE 1: password dojo ---------- */
+(() => {
+  const COMMON = ['password', 'пароль', '123456', '12345678', 'qwerty', 'йцукен', 'abc123', 'letmein', 'iloveyou', 'admin', 'welcome', 'monkey', 'dragon', 'football', 'minecraft', 'roblox', 'fortnite', 'snapchat', 'princess', 'sunshine', '111111', '123123', 'qwerty123', '1q2w3e', 'starwars', 'pokemon', 'tiktok', 'instagram', 'привіт', 'україна', 'slavaukraini'];
+  const WORDS = 'комета піца лазер черепаха кактус ракета піксель банан грім морж туманність крендель ніндзя манго льодовик вихор худі попкорн джунглі блискавка мармур видра чарівник калюжа ескіз ліхтар печиво сокіл орбіта'.split(' ');
+  const MSG = { idle: 'Привіт, я Байт! Введи пароль і стеж за моїм обличчям. 👀', dizzy: 'Цей пароль є в шпаргалці кожного хакера! 😵', sad: 'Ох… цей зламають за лічені секунди. 😢', meh: 'Вже краще. Додай довжини й різноманіття!', happy: 'Круто! Такий важко зламати. 😄', legend: 'ЛЕГЕНДАРНО. Хакери швидше підуть на пенсію. 👑' };
+  const LAB = ['Жах', 'Слабкий', 'Непоганий', 'Міцний', 'Легендарний'], COL = ['#ff4d8d', '#ff4d8d', '#ffd23f', '#39ff88', '#22e4ff'];
+  const byte = $('#byte'), inp = $('#pw');
+  function fmt(s) {
+    if (s < 1) return 'менше секунди';
+    if (s < 60) { const n = Math.round(s); return n + ' ' + pl(n, ['секунда', 'секунди', 'секунд']); }
+    if (s < 3600) { const n = Math.round(s / 60); return n + ' ' + pl(n, ['хвилина', 'хвилини', 'хвилин']); }
+    if (s < 86400) { const n = Math.round(s / 3600); return n + ' ' + pl(n, ['година', 'години', 'годин']); }
+    if (s < 2592000) { const n = Math.round(s / 86400); return n + ' ' + pl(n, ['день', 'дні', 'днів']); }
+    const y = s / 31536000;
+    if (y < 1) { const n = Math.round(s / 2592000); return n + ' ' + pl(n, ['місяць', 'місяці', 'місяців']); }
+    if (y < 1000) { const n = Math.round(y); return n.toLocaleString('uk-UA') + ' ' + pl(n, ['рік', 'роки', 'років']); }
+    if (y < 1e6) return Math.round(y / 1000).toLocaleString('uk-UA') + ' тис. років';
+    if (y < 1e9) return Math.round(y / 1e6).toLocaleString('uk-UA') + ' млн років';
+    return 'довше, ніж існує Всесвіт';
+  }
+  function analyze(pw) {
+    const low = pw.toLowerCase().replace(/[^a-zа-яіїєґ0-9]/g, '');
+    const c = { len: pw.length >= 12, up: /[A-ZА-ЯІЇЄҐ]/.test(pw), low: /[a-zа-яіїєґ]/.test(pw), num: /\d/.test(pw), sym: /[^A-Za-zА-Яа-яІіЇїЄєҐґ0-9]/.test(pw),
+      com: !COMMON.some(w => low.includes(w) && low.length <= w.length + 4), rep: !/(.)\1{2,}/.test(pw), seq: !/(012|123|234|345|456|567|678|789|abc|bcd|cde|def|qwe|wer|ert|asd|sdf|zxc|йцу|фів|ячс)/i.test(pw) };
+    let pool = (c.low ? 26 : 0) + (c.up ? 26 : 0) + (c.num ? 10 : 0) + (c.sym ? 33 : 0);
+    let bits = pw.length * Math.log2(pool || 1);
+    if (!c.rep) bits *= .75; if (!c.seq) bits *= .8; if (/^\d+$/.test(pw) && pw.length < 12) bits *= .7;
+    if (/^[A-Za-zА-Яа-яІіЇїЄєҐґ ]+$/.test(pw)) bits *= .7;
+    if (!c.com) bits = Math.min(bits, 14);
+    bits = Math.min(bits, 128);
+    const score = bits < 28 ? 0 : bits < 40 ? 1 : bits < 60 ? 2 : bits < 80 ? 3 : 4;
+    return { c, bits, score };
+  }
+  let mood = 'idle';
+  function setMood(m) { if (m === mood) return; mood = m; byte.dataset.mood = m; byte.classList.remove('pop'); void byte.getBoundingClientRect(); byte.classList.add('pop'); $('#pwBubble').textContent = MSG[m]; if (m === 'happy' || m === 'legend') sfx.good(); if (m === 'sad' || m === 'dizzy') sfx.bad(); }
+  function update() {
+    const pw = inp.value;
+    if (!pw) { $$('#meter i').forEach(i => i.classList.remove('on')); $('#pwLabel').textContent = 'Чекаю на тебе…'; $('#pwLabel').style.color = 'var(--muted)'; $('#pwBits').textContent = ''; $('#crack').textContent = '…'; $$('#checks li').forEach(l => l.classList.remove('ok')); setMood('idle'); return; }
+    const a = analyze(pw);
+    $$('#checks li').forEach(l => l.classList.toggle('ok', a.c[l.dataset.k]));
+    $$('#meter i').forEach((el, i) => { el.classList.toggle('on', i <= a.score); el.style.setProperty('--mc', COL[a.score]); });
+    $('#pwLabel').textContent = LAB[a.score]; $('#pwLabel').style.color = COL[a.score];
+    $('#pwBits').textContent = Math.round(a.bits) + ' біт';
+    $('#crack').textContent = fmt(Math.pow(2, a.bits) / 2 / 1e10);
+    setMood(!a.c.com ? 'dizzy' : a.score <= 1 ? 'sad' : a.score === 2 ? 'meh' : a.score === 3 ? 'happy' : 'legend');
+    if (a.score >= 3 && !S.done.pw) { addXP(30, 'Міцний пароль'); complete('pw'); }
+    if (a.score === 4 && !S.parts.pw4) { S.parts.pw4 = 1; save(); addXP(20, 'Легендарно!'); boom(); }
+  }
+  inp.addEventListener('input', update);
+  $('#pwEye').onclick = () => { inp.type = inp.type === 'password' ? 'text' : 'password'; };
+  $('#clr').onclick = () => { inp.value = ''; update(); inp.focus(); };
+  $('#gen').onclick = () => {
+    const w = Array.from({ length: 4 }, () => { const s = WORDS[rnd(WORDS.length)]; return s[0].toUpperCase() + s.slice(1); });
+    inp.type = 'text'; inp.value = w.join('-') + '-' + (10 + rnd(90)) + '!'; update(); toast('Свіжу парольну фразу створено ✨ Збережи її в менеджері паролів.');
+  };
+  addEventListener('pointermove', e => {
+    if (!['idle', 'meh'].includes(mood)) return; const r = byte.getBoundingClientRect();
+    const dx = Math.max(-1, Math.min(1, (e.clientX - r.left - r.width / 2) / 300)) * 5, dy = Math.max(-1, Math.min(1, (e.clientY - r.top - r.height / 2) / 300)) * 4;
+    $('#pupils').setAttribute('transform', `translate(${dx} ${dy})`);
+  });
+  let taps = 0;
+  byte.addEventListener('click', () => { taps++; byte.classList.add('pop'); if (taps === 5) { taps = 0; byte.classList.remove('spin'); void byte.offsetWidth; byte.classList.add('spin'); toast('Уііі! Байт робить бочку 🌀', 'warn'); boom({ particleCount: 60 }); } });
+})();
+
+/* ---------- ZONE 2: phishing ---------- */
+(() => {
+  const Q = [
+    { ch: 'email', name: 'Discord Gifts', addr: 'noreply@<mark class="sus">disc0rd-gifts.com</mark>', subj: '🎁 Ти виграв 3 місяці Nitro!', body: 'Вітаємо! Тебе обрано у випадковому розіграші. <mark class="sus">Забери приз протягом 10 хвилин</mark>, інакше він згорить назавжди.', cta: 'Забрати Nitro', url: '<mark class="sus">disc0rd-gifts.com</mark>/claim-nitro', phish: true, why: 'Два тривожні сигнали: у домені нуль замість «o», а 10-хвилинний таймер — це тиск. Справжнім розіграшам не треба, щоб ти поспішав.' },
+    { ch: 'email', name: 'Google', addr: 'no-reply@accounts.google.com', subj: 'Сповіщення безпеки: новий вхід у Windows', body: 'Ми помітили новий вхід в обліковий запис Google на пристрої з Windows. Якщо це був ти, нічого робити не треба. Якщо ні — ми допоможемо захистити акаунт.', cta: 'Перевірити активність', url: 'myaccount.google.com/notifications', phish: false, why: 'Справжнє. Домен точно google.com, немає погроз і не просять пароль. Порада профі: краще відкрий застосунок чи сайт сам, замість того щоб тицяти на посилання.' },
+    { ch: 'sms', name: 'Невідомий номер', addr: '+380 63 000 12 34', subj: '', body: 'Вашу посилку затримано. <mark class="sus">Сплатіть збір за повторну доставку 35 грн протягом 24 годин</mark>, інакше її повернуть відправнику:', cta: 'Сплатити збір', url: 'posylka-dostavka<mark class="sus">.top</mark>/pay', phish: true, why: 'Класичний «смішинг». Мала сума, жорсткий дедлайн і дивний домен .top. Мета — дані твоєї картки. Відстежуй посилки лише в офіційному застосунку перевізника.' },
+    { ch: 'dm', name: 'maya.xo (твоя подруга)', addr: 'Direct в Instagram', subj: '', body: '<mark class="sus">ого, це ти на цьому відео?? 😭😭 дивись, поки не видалили</mark>', cta: 'Дивитися відео', url: '<mark class="sus">insta-vid.link</mark>/watch?u=you', phish: true, why: 'Зламані акаунти розсилають наживку друзям. Паніка в тоні й дивне посилання видають підробку. Напиши Майї в іншому месенджері, щоб перевірити, і не відкривай посилання.' },
+    { ch: 'email', name: 'Олена Петрівна', addr: 'o.petrivna@licey12.edu.ua', subj: 'Проєкт із фізики — до п’ятниці', body: 'Привіт, клас! Нагадую, що лабораторні роботи потрібно здати до п’ятниці. Слайди вже на сторінці класу. Пишіть мені, якщо щось незрозуміло!', cta: 'Відкрити сторінку класу', url: 'licey12.edu.ua/classes/physics', phish: false, why: 'Справжнє. Відомий відправник, домен школи збігається, звичайне прохання, жодних погроз чи призів. Не все навколо — пастка. Будь уважним, але не параноїком.' },
+    { ch: 'email', name: 'Підтримка TikTok', addr: 'verify@<mark class="sus">tiktok-support.co</mark>', subj: 'Твій акаунт може отримати галочку верифікації ✅', body: 'Надішли у відповідь <mark class="sus">логін і пароль</mark>, щоб підтвердити особу й отримати верифікацію вже сьогодні.', cta: 'Почати верифікацію', url: '<mark class="sus">tiktok-support.co</mark>/verify', phish: true, why: 'Жодна справжня платформа ніколи не проситиме пароль у листі чи повідомленні. Ніколи. Уже цього досить, щоб це був фішинг.' },
+    { ch: 'email', name: 'Duolingo', addr: 'hello@duolingo.com', subj: '🔥 Твоя серія ось-ось обірветься!', body: 'Ти сьогодні ще не вчився. Короткий 5-хвилинний урок збереже твою серію.', cta: 'Вчитися зараз', url: 'duolingo.com/practice', phish: false, why: 'Набридлива сова, але справжня. Правильний домен, нічого чутливого не просять. Наполегливість — ще не фішинг. Дивись на домен і на те, що просять зробити.' },
+    { ch: 'dm', name: 'xX_Trader_Xx', addr: 'Чат Steam', subj: '', body: 'йоу, обміняю тобі скін на ніж на щось із твого інвентаря. Прийми обмін тут:', cta: 'Переглянути обмін', url: '<mark class="sus">steamcomrnunity</mark>.com/tradeoffer/new', phish: true, why: 'Придивись: «rn» прикидається літерою «m». steamcomrnunity.com — домен-двійник, який показує фальшиву сторінку входу, щоб вкрасти акаунт.' }
+  ];
+  const icon = { email: '✉️ Електронний лист', sms: '💬 SMS', dm: '🗨️ Особисте повідомлення' };
+  let order, i, score, streak, scans, right, res, scanned, locked;
+  const stage = $('#pStage');
+  function start() {
+    order = shuffle(Q); i = 0; score = 0; streak = 0; scans = 3; right = 0; res = []; locked = false; upd(); show();
+  }
+  function upd() {
+    $('#pScore').textContent = score; $('#pStreak').textContent = '🔥 ' + streak; $('#pScans').textContent = scans;
+    $('#pDots').innerHTML = order.map((_, k) => `<i class="${res[k] === 1 ? 'ok' : res[k] === 0 ? 'no' : k === i ? 'cur' : ''}"></i>`).join('');
+  }
+  function bump(id) { const e = $(id); e.classList.remove('bump'); void e.offsetWidth; e.classList.add('bump'); }
+  function show() {
+    const q = order[i]; scanned = false; locked = false;
+    stage.innerHTML = `<div class="pcard" id="pc">
+      <div class="pbar">${icon[q.ch]}<span style="margin-left:auto">Повідомлення ${i + 1} з ${order.length}</span></div>
+      <div class="pbody">
+        <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px"><div class="avatar">${q.name[0].toUpperCase()}</div><div><b>${q.name}</b><div style="font:500 .82rem 'JetBrains Mono',monospace;color:var(--muted);word-break:break-all">${q.addr}</div></div></div>
+        ${q.subj ? `<div style="font-weight:800;font-size:1.1rem;margin-bottom:8px">${q.subj}</div>` : ''}
+        <p style="margin:0">${q.body}</p>
+        <button class="linkbtn" type="button" id="lk">${q.cta}</button>
+        <div class="urlprev">🔗 ${q.url}</div>
+      </div>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:16px">
+      <button class="btn pink" id="aP" type="button">🎣 Це фішинг</button>
+      <button class="btn green" id="aL" type="button">✅ Це справжнє</button>
+      <button class="btn ghost" id="aS" type="button" style="margin-left:auto">🔍 Скан прапорців</button>
+    </div><div id="pFb" aria-live="polite"></div>`;
+    $('#aP').onclick = () => answer(true); $('#aL').onclick = () => answer(false);
+    $('#aS').onclick = scan;
+    $('#lk').onclick = () => { toast('Ого, ти натиснув! У реальності спершу перевіряй посилання.', 'warn'); sfx.bad(); };
+    upd();
+  }
+  function scan() {
+    if (locked) return; const pc = $('#pc'), q = order[i];
+    if (pc.classList.contains('scan')) { pc.classList.remove('scan'); return; }
+    if (!scanned) { if (scans <= 0) return toast('Сканувань більше немає!', 'warn'); scans--; scanned = true; upd(); bump('#pScans'); }
+    pc.classList.add('scan');
+    if (!q.phish) toast('Скан завершено: червоних прапорців не знайдено 🤔', 'warn');
+  }
+  function answer(sayPhish) {
+    if (locked) return; locked = true; const q = order[i], ok = sayPhish === q.phish, pc = $('#pc');
+    pc.classList.remove('scan'); pc.classList.add(ok ? 'good' : 'bad'); $$('#pStage .btn').forEach(b => b.disabled = true);
+    let pts = 0;
+    if (ok) { pts = scanned ? 5 : 8; streak++; if (streak >= 3) pts += 2; score += pts; right++; res[i] = 1; sfx.good(); boom({ particleCount: 35, spread: 50, origin: { y: .65 } }); }
+    else { streak = 0; res[i] = 0; sfx.bad(); }
+    upd(); bump('#pScore'); bump('#pStreak');
+    $('#pFb').innerHTML = `<div class="fb ${ok ? 'good' : 'bad'}"><b>${ok ? '✅ Гарний улов!' + (pts ? ' +' + pts + ' б.' : '') : '❌ Не зовсім.'}</b> Правильна відповідь: <b>${q.phish ? 'фішинг' : 'справжнє повідомлення'}</b>. ${q.why}<div style="margin-top:12px"><button class="btn" id="nx" type="button">${i + 1 < order.length ? 'Наступне повідомлення' : 'Побачити результат'}</button></div></div>`;
+    $('#nx').onclick = () => { i++; if (i < order.length) show(); else finish(); };
+    $('#nx').focus({ preventScroll: true });
+  }
+  function finish() {
+    i = order.length; upd();
+    const rank = right >= 8 ? 'Легенда полювання на фішинг 🏹' : right >= 6 ? 'Пильний захисник 🛡️' : right >= 4 ? 'Уже тепліше 🌡️' : 'Свіжа наживка 🐟';
+    stage.innerHTML = `<div class="cert" style="border-color:var(--pink)"><div style="font-size:3rem">${right >= 6 ? '🏆' : '🎣'}</div><h3 style="font-size:1.25rem;margin:8px 0">Правильно: ${right} з ${order.length}</h3><p style="margin:0 0 6px">Рахунок: <b>${score}</b> · ${rank}</p><p style="color:var(--muted);margin:0 0 16px">${right >= 6 ? 'Значок отримано!' : 'Відповідь правильно на 6, щоб отримати значок «Мисливець на фішинг».'}</p><button class="btn" id="rp" type="button">↺ Грати ще раз</button></div>`;
+    $('#rp').onclick = start;
+    const gain = Math.max(0, score - (S.best.phish || 0)); if (gain) { S.best.phish = score; save(); addXP(gain, 'Фішинг-виклик'); }
+    if (right >= 6) complete('phish'); else if (right >= 4) boom({ particleCount: 60 });
+  }
+  start();
+})();
+
+/* ---------- ZONE 3: footprint ---------- */
+(() => {
+  const CH = [
+    { id: 'loc', i: '📍', l: 'Геопозначки в кожному дописі', w: 18, on: 1, fix: 'Вимкни геопозначки. Публікуй місце, коли вже пішов звідти.' },
+    { id: 'bday', i: '🎂', l: 'Повна дата народження в профілі', w: 14, on: 1, fix: 'Сховай рік народження. Це улюблений «ключ» для крадіїв особистості.' },
+    { id: 'school', i: '🏫', l: 'Назва школи в біо', w: 14, on: 0, fix: 'Прибери школу. Разом із фото це підказує незнайомцям, де тебе шукати.' },
+    { id: 'user', i: '🪪', l: 'Той самий нікнейм скрізь', w: 16, on: 1, fix: 'Використовуй різні нікнейми, щоб ніхто не зв’язав усі твої акаунти.' },
+    { id: 'cookie', i: '🍪', l: '«Прийняти все» в кожному cookie-вікні', w: 14, on: 1, fix: 'Обирай «Відхилити» або «Лише необхідні». Це зупиняє чимало стеження.' },
+    { id: 'wifi', i: '📶', l: 'Безкоштовний Wi-Fi без VPN', w: 12, on: 0, fix: 'Не входь в акаунти через відкритий Wi-Fi або користуйся VPN.' },
+    { id: 'sso', i: '🔗', l: '«Увійти через…» у кожному застосунку', w: 12, on: 1, fix: 'Роби окремі логіни для застосунків, яким не довіряєш. Менше зв’язків між даними.' },
+    { id: 'live', i: '✈️', l: 'Дописи про поїздки, поки тебе немає вдома', w: 10, on: 1, fix: 'Публікуй фото з відпустки, коли повернешся додому.' }
+  ];
+  const AUD = [{ m: .3, r: 15 }, { m: .55, r: 400 }, { m: .8, r: 20000 }, { m: 1.15, r: 3000000 }];
+  const ND = [
+    { id: 'friends', i: '👥', l: 'Друзі', c: '#39ff88', s: () => true },
+    { id: 'strangers', i: '🕵️', l: 'Незнайомці', c: '#ffd23f', s: (a) => a >= 2 },
+    { id: 'scrapers', i: '🤖', l: 'Скрейпери та ШІ', c: '#a855f7', s: (a) => a >= 3 },
+    { id: 'brokers', i: '📊', l: 'Брокери даних', c: '#22e4ff', s: (a, h) => h.cookie || h.sso || h.user },
+    { id: 'ads', i: '🎯', l: 'Рекламодавці', c: '#ff9f43', s: (a, h) => h.cookie || h.sso },
+    { id: 'scam', i: '🦹', l: 'Шахраї', c: '#ff4d8d', s: (a, h) => (h.loc || h.bday || h.school) && a >= 1 },
+    { id: 'snoop', i: '📡', l: 'Wi-Fi-шпигуни', c: '#ff4d8d', s: (a, h) => h.wifi },
+    { id: 'opp', i: '🚪', l: 'Опортуністи', c: '#ffd23f', s: (a, h) => h.live && a >= 2 }
+  ];
+  const H = {}; CH.forEach(c => H[c.id] = !!c.on);
+  let aud = 3, target = 0, shown = 0, ghosts = [], pulses = [], alpha = ND.map(() => 0), visible = true;
+  const cv = $('#fpCanvas'), x = cv.getContext('2d'), dpr = Math.min(2, devicePixelRatio || 1); let W = 0, Hh = 0;
+  function resize() { const r = cv.getBoundingClientRect(); W = r.width; Hh = r.height; cv.width = W * dpr; cv.height = Hh * dpr; }
+  new ResizeObserver(resize).observe(cv); new IntersectionObserver(e => visible = e[0].isIntersecting).observe(cv); resize();
+
+  const col = e => e < 35 ? '#39ff88' : e < 65 ? '#ffd23f' : '#ff4d8d';
+  const lbl = e => e < 15 ? 'Привид 👻' : e < 35 ? 'Непомітний 😎' : e < 65 ? 'Помітний 👀' : e < 85 ? 'Відкрита книга 📖' : 'Білборд 📢';
+  function calc() { const sum = CH.reduce((s, c) => s + (H[c.id] ? c.w : 0), 0); return Math.min(100, Math.round(sum * AUD[aud].m)); }
+  function build() {
+    $('#fpChips').innerHTML = CH.map(c => `<button type="button" class="chipt ${H[c.id] ? 'on' : ''}" data-id="${c.id}" aria-pressed="${H[c.id]}"><span style="font-size:1.2rem">${c.i}</span>${c.l}<span class="sw"></span></button>`).join('');
+    $$('.chipt').forEach(b => b.onclick = () => { H[b.dataset.id] = !H[b.dataset.id]; build(); change(); });
+  }
+  function change() {
+    target = calc();
+    const top = CH.filter(c => H[c.id]).sort((a, b) => b.w - a.w)[0];
+    const adv = $('#fpAdvice');
+    if (target <= 30) { adv.className = 'fb good'; adv.innerHTML = '<b>🥷 Ніндзя цифрового сліду.</b> Низька експозиція, а інтернетом усе одно можна користуватися.'; }
+    else { adv.className = 'fb bad'; adv.innerHTML = '<b>Швидка підказка:</b> ' + (top ? top.fix : 'Звузь коло тих, хто бачить твої дописи.') + (aud > 1 ? ' Спробуй ще й звузити аудиторію повзунком.' : ''); }
+    $('#reach').textContent = AUD[aud].r.toLocaleString('uk-UA') + (aud === 3 ? '+' : '');
+    if (target <= 30 && !S.done.foot) { addXP(40, 'Слід зменшено'); complete('foot'); }
+  }
+  $('#aud').oninput = e => { aud = +e.target.value; change(); sfx.click(); };
+  $('#fpReset').onclick = () => { CH.forEach(c => H[c.id] = !!c.on); aud = 3; $('#aud').value = 3; ghosts = []; build(); change(); };
+  $('#delPost').onclick = () => {
+    toast('Допис видалено 🗑️ …чи ні?', 'warn');
+    setTimeout(() => {
+      const icons = [['📸', 'Скриншот'], ['🗄️', 'Веб-архів'], ['📥', 'Збережено підписником'], ['🤖', 'Зібрано скрейпером']];
+      icons.forEach((g, k) => ghosts.push({ x: Math.random() * W * .6 + W * .2, y: Math.random() * Hh * .5 + Hh * .25, vx: (Math.random() - .5) * .3, vy: (Math.random() - .5) * .3, i: g[0], l: g[1], born: performance.now() + k * 150 }));
+      toast('Копії все ще існують. Інтернет нічого не забуває.', 'warn'); sfx.bad();
+    }, 700);
+  };
+  let last = 0, acc = 0;
+  (function loop(ts) {
+    requestAnimationFrame(loop); if (!visible || !W) return;
+    const dt = Math.min(50, ts - (last || ts)); last = ts; acc += dt;
+    shown += (target - shown) * Math.min(1, dt / 160); const e = Math.round(shown);
+    $('#expNum').textContent = e; $('#expNum').style.color = col(e); $('#expLbl').textContent = lbl(e); $('#expLbl').style.color = col(e);
+    x.setTransform(dpr, 0, 0, dpr, 0, 0); x.clearRect(0, 0, W, Hh);
+    const cx = W / 2, cy = Hh / 2, m = Math.min(W, Hh), Rx = W * .385, Ry = Hh * .36, r1 = m * .17;
+    x.lineWidth = 1; x.setLineDash([4, 8]); x.strokeStyle = 'rgba(148,163,184,.22)';
+    x.beginPath(); x.ellipse(cx, cy, Rx, Ry, 0, 0, 6.283); x.stroke(); x.beginPath(); x.arc(cx, cy, r1 * 1.45, 0, 6.283); x.stroke(); x.setLineDash([]);
+    const pos = ND.map((n, k) => { const a = (-90 + k * 360 / ND.length) * Math.PI / 180; return { x: cx + Math.cos(a) * Rx, y: cy + Math.sin(a) * Ry }; });
+    ND.forEach((n, k) => {
+      const vis = n.s(aud, H); alpha[k] += ((vis ? 1 : 0) - alpha[k]) * Math.min(1, dt / 200); const al = alpha[k]; if (al < .02) return;
+      const p = pos[k]; x.globalAlpha = al * .4; x.strokeStyle = n.c; x.lineWidth = 1.5; x.beginPath(); x.moveTo(cx, cy); x.lineTo(p.x, p.y); x.stroke();
+      x.globalAlpha = al; x.fillStyle = 'rgba(15,23,42,.92)'; x.strokeStyle = n.c; x.lineWidth = 2; x.beginPath(); x.arc(p.x, p.y, 25, 0, 6.283); x.fill(); x.stroke();
+      x.font = '24px system-ui, sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillStyle = '#fff'; x.fillText(n.i, p.x, p.y + 1);
+      x.font = '700 12px Manrope, sans-serif'; x.fillStyle = '#cbd5e1'; x.fillText(n.l, p.x, p.y + 40);
+    });
+    x.globalAlpha = 1;
+    if (!reduce && acc > 380 / (.4 + shown / 50)) { acc = 0; ND.forEach((n, k) => { if (alpha[k] > .8 && Math.random() < .55) pulses.push({ k, t: 0 }); }); }
+    pulses = pulses.filter(p => (p.t += dt / 1300) < 1);
+    pulses.forEach(p => { const n = ND[p.k], q = pos[p.k], px = cx + (q.x - cx) * p.t, py = cy + (q.y - cy) * p.t; x.globalAlpha = Math.sin(p.t * Math.PI); x.fillStyle = n.c; x.shadowColor = n.c; x.shadowBlur = 12; x.beginPath(); x.arc(px, py, 4, 0, 6.283); x.fill(); x.shadowBlur = 0; });
+    x.globalAlpha = 1;
+    const act = CH.filter(c => H[c.id]);
+    act.forEach((c, k) => { const a = ts * .00035 + k * 6.283 / act.length, px = cx + Math.cos(a) * r1 * 1.45, py = cy + Math.sin(a) * r1 * 1.45; x.fillStyle = 'rgba(15,23,42,.9)'; x.strokeStyle = 'rgba(255,77,141,.6)'; x.lineWidth = 1.5; x.beginPath(); x.arc(px, py, 15, 0, 6.283); x.fill(); x.stroke(); x.font = '16px system-ui'; x.fillStyle = '#fff'; x.fillText(c.i, px, py + 1); });
+    const g = x.createRadialGradient(cx, cy, 4, cx, cy, r1 * 1.1); const cc = col(shown); g.addColorStop(0, cc); g.addColorStop(1, 'rgba(0,0,0,0)');
+    x.globalAlpha = .35 + Math.sin(ts / 400) * .1; x.fillStyle = g; x.beginPath(); x.arc(cx, cy, r1 * 1.1, 0, 6.283); x.fill(); x.globalAlpha = 1;
+    x.fillStyle = '#0b1224'; x.strokeStyle = cc; x.lineWidth = 3; x.beginPath(); x.arc(cx, cy, 30, 0, 6.283); x.fill(); x.stroke();
+    x.font = '700 13px Unbounded, sans-serif'; x.fillStyle = '#fff'; x.fillText('ТИ', cx, cy + 1);
+    ghosts.forEach(gh => { const age = Math.max(0, ts - gh.born); if (!age) return; gh.x += gh.vx; gh.y += gh.vy; if (gh.x < 30 || gh.x > W - 30) gh.vx *= -1; if (gh.y < 30 || gh.y > Hh - 30) gh.vy *= -1;
+      x.globalAlpha = Math.min(.9, age / 400); x.font = '22px system-ui'; x.fillStyle = '#fff'; x.fillText(gh.i, gh.x, gh.y); x.font = '700 11px Manrope'; x.fillStyle = '#ff9fbd'; x.fillText(gh.l, gh.x, gh.y + 22); x.globalAlpha = 1; });
+  })(0);
+  build(); change(); shown = target;
+})();
+
+/* ---------- ZONE 4: quiz + lab ---------- */
+(() => {
+  const SC = [
+    { who: 'GameDev_Official', msg: 'Привіт! Я з команди розробників. Тебе обрано для рідкісного скіна. Надішли мені свій логін і пароль, щоб я подарував його напряму. 🎮', o: [['Надішлю. Це ж команда розробників!', 0, 'Справжній персонал ніколи не просить пароль. Якщо надішлеш його, віддаси свій акаунт.'], ['Попрошу докази, а тоді надішлю', 0, 'Фальшиві «докази» зробити легко. Підозрілий сам запит.'], ['Не відповідатиму. Поскаржуся й заблокую', 1, 'Саме так. Поскаржся на акаунт і заблокуй його.'], ['Надішлю лише половину пароля', 0, 'Навіть половина пароля — це добрий старт для хакера.']], why: 'Справжні компанії ніколи не просять твій пароль. Подарунки, для яких потрібен логін, — це шахрайство.' },
+    { who: 'Данило (новий номер)', msg: 'Привіт, це я! Загубив телефон, це мій новий номер. Скинеш 500 грн на картку? Поверну ввечері 🙏', o: [['Скину, він же у скруті', 0, 'Паніка тут навмисна. Повернути гроші з шахрайської картки майже неможливо.'], ['Зателефоную або напишу Данилові в його звичайний акаунт', 1, 'Так! Перевіряй через канал, якому вже довіряєш.'], ['Запитаю, яка його улюблена група', 0, 'Шахраї можуть вгадати чи знайти такі деталі. Перевіряй через інший канал.'], ['Скину меншу суму', 0, 'Будь-яка сума підгодовує шахрайство.']], why: 'Шахрайство з підміною особи тримається на довірі й поспіху. Завжди підтверджуй через канал, який ти вже знаєш.' },
+    { who: 'QuizzyFun.app', msg: 'Який ти лиходій із кіно? Спершу розкажи: як звали твого першого улюбленця, на якій вулиці ти виріс і дівоче прізвище мами! 🦹', o: [['Відповім чесно, це ж просто розвага', 0, 'Це типові відповіді на контрольні питання для відновлення акаунта. Такі квізи їх збирають.'], ['Пропущу цей квіз', 1, 'Розумно. Можна ще вигадати хибні відповіді, але пропустити найпростіше.'], ['Відповім за друга', 0, 'Ти все одно віддаси чужі особисті дані.'], ['Поділюся, щоб друзі теж пройшли', 0, 'Так збір даних поширюється на більше людей.']], why: 'Розважальні квізи можуть непомітно збирати відповіді на питання для відновлення доступу.' },
+    { who: 'Спливаюче вікно в браузері', msg: '⚠️ УВАГА: виявлено 5 вірусів! Негайно зателефонуйте за номером 0 800 000 000 або завантажте CleanMax!', o: [['Зателефоную за номером', 0, 'Це виведе на фальшивого «техпідтримника», якому потрібен віддалений доступ чи гроші.'], ['Завантажу CleanMax', 0, 'Швидше за все, саме цей файл і є справжнім шкідником.'], ['Закрию вкладку й нічого не натискатиму', 1, 'Правильно. Якщо вкладка не закривається, закрий браузер і запусти знову.'], ['Натисну «OK», щоб закрити вікно', 0, 'Навіть кнопка «OK» може запустити завантаження чи перенаправлення.']], why: 'Браузер не сканує пристрій і не показує номери телефонів. Вікна-залякувалки — фальшиві.' },
+    { who: 'lily_sunset22', msg: 'Приві-іт 💕 у нас 2 спільні друзі! Акаунту 2 дні. «Додай мене в Telegram? Там приватніше. Надішли фотку, щоб я знала, що ти справжній 😘»', o: [['Перейду в Telegram, що поганого?', 0, 'Перехід із модерованих платформ — класичний хід шахраїв і зловмисників.'], ['Надішлю фото. Резонно', 0, 'Фото можуть використати проти тебе. Ніколи не надсилай їх тим, кого не перевірив.'], ['Відхилю, поскаржуся, а якщо тиснутимуть — розповім дорослому, якому довіряю', 1, 'Так. Нові акаунти, що наполягають на приватних чатах і фото, — серйозний червоний прапорець.'], ['Попрошу її надіслати фото першою', 0, 'Вкрадені фото легко знайти. Картинка нікого не підтверджує.']], why: 'Фальшиві профілі швидко будують довіру. Якщо хтось тисне на тебе, вимагаючи фото чи гроші, зупинись, зроби скриншот і розкажи дорослому, якому довіряєш.' },
+    { who: 'FlashLight Pro (застосунок)', msg: 'Дозволити доступ до: контактів, мікрофона, точної геолокації, фото та історії дзвінків?', o: [['Дозволю все, щоб працювало', 0, 'Ліхтарику нічого з цього не треба. Це збір даних.'], ['Заборону. Йому потрібен лише спалах камери', 1, 'Правильно. Дозволяй лише те, що відповідає роботі застосунку.'], ['Дозволю лише контакти', 0, 'Усе одно не потрібно. Забороняй або обери інший застосунок.'], ['Дозволю один раз, а потім вимкну', 0, 'Щойно застосунок отримав дані, їх уже не забрати назад.']], why: 'Якщо дозволи не збігаються з призначенням, забороняй їх. Або просто не ставити такий застосунок.' }
+  ];
+  const ST = [
+    { l: 'Закритий акаунт', d: 'Дописи бачать лише схвалені підписники', safe: true, on: false, why: 'Закритий акаунт не пускає до твоїх дописів незнайомців і скрейперів.' },
+    { l: 'Ділитися геопозицією наживо', d: 'Друзі бачать, де ти зараз', safe: false, on: true, why: 'Геопозиція наживо — це карта до твоїх дверей. Вимкни або залиш лише для родини.' },
+    { l: 'Двофакторна автентифікація', d: 'Код при вході в акаунт', safe: true, on: false, why: '2FA зупиняє більшість зламів акаунтів, навіть якщо пароль витік.' },
+    { l: 'Будь-хто може тебе відмічати', d: 'Без схвалення відміток на фото', safe: false, on: true, why: 'Схвалюй відмітки сам, інакше тебе прив’яжуть до контенту, який ти б не обрав.' },
+    { l: 'Персоналізоване рекламне стеження', d: 'Застосунки слідкують за тобою в мережі', safe: false, on: true, why: 'Вимкнення зменшує обсяг даних про твою поведінку, що збираються.' },
+    { l: 'Сповіщення про вхід', d: 'Повідомлення про входи з нових пристроїв', safe: true, on: false, why: 'Сповіщення одразу покажуть, якщо в акаунт зайшов хтось інший.' },
+    { l: 'Повідомлення від будь-кого', d: 'Незнайомці можуть писати тобі', safe: false, on: true, why: 'Обмеж повідомлення друзями, щоб зменшити шахрайство й небажані контакти.' }
+  ];
+  const qp = $('#quizPane'), lp = $('#labPane');
+  $('#tabQ').onclick = () => tab(0); $('#tabL').onclick = () => tab(1);
+  function tab(n) { qp.style.display = n ? 'none' : ''; lp.style.display = n ? '' : 'none'; $('#tabQ').classList.toggle('on', !n); $('#tabL').classList.toggle('on', !!n); }
+  let qi, qs, order;
+  function qStart() { order = shuffle(SC); qi = 0; qs = 0; qShow(); }
+  function qShow() {
+    const s = order[qi], opts = shuffle(s.o);
+    qp.innerHTML = `<div class="dots" style="margin-bottom:16px">${order.map((_, k) => `<i class="${k < qi ? 'ok' : k === qi ? 'cur' : ''}"></i>`).join('')}</div>
+      <div style="color:var(--muted);font-size:.85rem">Сценарій ${qi + 1} з ${order.length} · Рахунок ${qs}</div>
+      <div class="chat"><div class="avatar" style="background:linear-gradient(135deg,#ff4d8d,#ffd23f)">?</div><div class="bub"><div class="who">${s.who}</div>${s.msg}</div></div>
+      <div style="font-weight:700">Що ти робиш?</div>
+      <div id="opts">${opts.map((o, k) => `<button class="opt" type="button" data-k="${k}">${o[0]}</button>`).join('')}</div><div id="qfb" aria-live="polite"></div>`;
+    $$('#opts .opt').forEach(b => b.onclick = () => {
+      const o = opts[+b.dataset.k]; $$('#opts .opt').forEach((bb, k) => { bb.disabled = true; if (opts[k][1]) bb.classList.add('right'); });
+      if (o[1]) { qs++; sfx.good(); boom({ particleCount: 40, spread: 55, origin: { y: .7 } }); } else { b.classList.add('wrong'); sfx.bad(); }
+      $('#qfb').innerHTML = `<div class="fb ${o[1] ? 'good' : 'bad'}"><b>${o[1] ? '✅ Правильно!' : '❌ Обережно!'}</b> ${o[2]}<div style="margin-top:8px;color:var(--muted)">${s.why}</div><div style="margin-top:12px"><button class="btn" id="qn" type="button">${qi + 1 < order.length ? 'Наступний сценарій' : 'Побачити результат'}</button></div></div>`;
+      $('#qn').onclick = () => { qi++; qi < order.length ? qShow() : qEnd(); }; $('#qn').focus({ preventScroll: true });
+    });
+  }
+  function qEnd() {
+    qp.innerHTML = `<div class="cert" style="border-color:var(--purple)"><div style="font-size:3rem">${qs >= 5 ? '🧠' : '🤔'}</div><h3 style="font-size:1.25rem;margin:8px 0">Шахрайств уникнуто: ${qs} з ${order.length}</h3><p style="color:var(--muted);margin:0 0 16px">${qs >= 5 ? 'Пройдено! Тепер заверши лабораторію налаштувань.' : 'Відповідь правильно на 5, щоб пройти цю частину.'}</p><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap"><button class="btn" id="qr" type="button">↺ Спробувати ще раз</button><button class="btn purple" id="ql" type="button">До лабораторії налаштувань</button></div></div>`;
+    $('#qr').onclick = qStart; $('#ql').onclick = () => tab(1);
+    const gain = Math.max(0, qs * 10 - (S.best.quiz || 0)); if (gain) { S.best.quiz = qs * 10; save(); addXP(gain, 'Сценарії'); }
+    if (qs >= 5) { S.parts.q = 1; save(); boom(); checkQuiz(); }
+  }
+  function checkQuiz() { if (S.parts.q && S.parts.lab) complete('quiz'); }
+  let cur;
+  function lab() {
+    cur = ST.map(s => s.on);
+    lp.innerHTML = `<p style="margin:0 0 14px;color:var(--muted)">Цей акаунт відкритий навстіж. Перемикай повзунки, щоб його захистити, а потім запусти аудит.</p>
+      <div class="phone"><div style="text-align:center;font-weight:800;margin-bottom:10px">⚙️ Приватність і безпека</div>
+      ${ST.map((s, k) => `<div class="set" data-k="${k}"><div><b>${s.l}</b><small>${s.d}</small><small class="why" style="display:none;margin-top:4px;color:var(--text)"></small></div><button class="tog" type="button" role="switch" aria-checked="${s.on}" aria-label="${s.l}"></button></div>`).join('')}</div>
+      <div style="text-align:center;margin-top:18px"><button class="btn purple" id="audit" type="button">🔎 Перевірити мої налаштування</button><div id="auditOut" style="margin-top:14px" aria-live="polite"></div></div>`;
+    $$('.tog').forEach((t, k) => t.onclick = () => { cur[k] = !cur[k]; t.setAttribute('aria-checked', cur[k]); const row = t.closest('.set'); row.classList.remove('right', 'wrong'); row.querySelector('.why').style.display = 'none'; });
+    $('#audit').onclick = () => {
+      let ok = 0;
+      ST.forEach((s, k) => { const row = $$('.set')[k], good = cur[k] === s.safe; row.classList.remove('right', 'wrong'); void row.offsetWidth; row.classList.add(good ? 'right' : 'wrong'); const w = row.querySelector('.why'); w.textContent = (good ? '✅ ' : '⚠️ ') + s.why; w.style.display = 'block'; if (good) ok++; });
+      const all = ok === ST.length;
+      $('#auditOut').innerHTML = `<div class="fb ${all ? 'good' : 'bad'}" style="text-align:left"><b>Безпечних налаштувань: ${ok} з ${ST.length}.</b> ${all ? 'Усе надійно закрито! 🔒' : 'Виправ червоні й перевір ще раз.'}</div>`;
+      all ? sfx.win() : sfx.bad();
+      if (all) { boom(); if (!S.parts.lab) { S.parts.lab = 1; save(); addXP(30, 'Лабораторія налаштувань'); checkQuiz(); } }
+    };
+  }
+  qStart(); lab();
+})();
+
+/* ---------- finale ---------- */
+$('#certBtn').onclick = () => {
+  const n = $('#certName').value.trim() || 'Кібергерой', d = new Date().toLocaleDateString('uk-UA', { year: 'numeric', month: 'long', day: 'numeric' });
+  $('#certOut').innerHTML = `<div class="cert"><div style="font-size:3rem">🏆</div><div style="color:var(--muted)">Цим засвідчується, що</div><h3 style="font-size:clamp(1.3rem,5vw,2rem);margin:8px 0;background:linear-gradient(90deg,var(--yellow),var(--pink));-webkit-background-clip:text;background-clip:text;color:transparent"></h3><p style="margin:0">пройшов(ла) усі зони SafeNet Quest і здобув(ла) <b>${S.xp} XP</b></p><div style="color:var(--muted);margin-top:8px;font-size:.9rem">${d}</div></div>`;
+  $('#certOut h3').textContent = n; sfx.win(); fireworks(); setTimeout(fireworks, 1200);
+  $('#certOut').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' });
+};
+
+/* ---------- tip of the day ---------- */
+(() => {
+  const T = ['Використовуй парольну фразу: чотири випадкові слова перемагають «P@ssw0rd1!» щоразу.', 'Увімкни двофакторну автентифікацію спершу для пошти. Це ключ до всіх твоїх інших акаунтів.', 'Наведи курсор (або довго утримуй палець) на посилання, щоб побачити справжню адресу, перш ніж відкрити.', 'Справжні компанії ніколи не просять пароль у повідомленні чи листі.', 'Зроби зворотний пошук зображення аватарки нового «друга». Вкрадені фото трапляються постійно.', 'Публікуй фото з поїздки, коли вже вдома, а не поки квартира порожня.', 'Один пароль на один акаунт. Менеджер паролів запам’ятає за тебе.', 'Якщо повідомлення викликає паніку чи запускає відлік, зупинись. Поспіх — улюблений інструмент шахраїв.', 'Перевіряй дозволи застосунків. Ліхтарику не потрібні твої контакти.', 'Публічний Wi-Fi підходить для мемів, але не для банкінгу. Якщо треба, користуйся VPN.', 'Скриншоти живуть вічно. Не надсилай того, що не хотів би бачити розповсюдженим.', 'Тебе тиснуть, вимагаючи фото чи гроші? Зупинись, зроби скриншот, розкажи дорослому, якому довіряєш, а тоді поскаржся й заблокуй.'];
+  const doy = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 864e5); let k = doy % T.length;
+  const p = $('#tipPanel'), b = $('#tipBtn');
+  const show = () => { $('#tipText').textContent = T[k]; };
+  const open = o => { p.classList.toggle('open', o); b.setAttribute('aria-expanded', o); $('#tipDot').style.display = 'none'; show(); };
+  b.onclick = () => open(!p.classList.contains('open')); $('#tipX').onclick = () => open(false);
+  $('#tipNext').onclick = () => { k = (k + 1) % T.length; show(); };
+  addEventListener('keydown', e => { if (e.key === 'Escape') open(false); });
+})();
+
+/* ---------- easter eggs ---------- */
+(() => {
+  const seq = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a']; let pos = 0;
+  const mc = $('#matrix'), mx = mc.getContext('2d');
+  function rain() {
+    mc.width = innerWidth; mc.height = innerHeight; const cols = Math.floor(mc.width / 16), drops = Array(cols).fill(0).map(() => Math.random() * -40); let f = 0;
+    (function d() {
+      mx.fillStyle = 'rgba(9,13,22,.12)'; mx.fillRect(0, 0, mc.width, mc.height); mx.fillStyle = '#39ff88'; mx.font = '15px JetBrains Mono, monospace';
+      drops.forEach((y, i) => { mx.fillText(String.fromCharCode(0x30A0 + Math.random() * 60), i * 16, y * 16); drops[i] = y * 16 > mc.height && Math.random() > .975 ? 0 : y + 1; });
+      if (++f < 260) requestAnimationFrame(d); else { mx.clearRect(0, 0, mc.width, mc.height); }
+    })();
+  }
+  function hack() {
+    document.body.classList.toggle('hacker'); const on = document.body.classList.contains('hacker');
+    toast(on ? '🕹️ Режим хакера: УВІМК. Ласкаво просимо в матрицю.' : 'Режим хакера: ВИМК.', 'lvl'); sfx.win(); if (on && !reduce) rain(); if (on) boom({ colors: ['#39ff88', '#00b35a', '#ffffff'] });
+    if (!S.secret) { S.secret = true; save(); progress(); addXP(25, 'Секрет знайдено'); }
+  }
+  addEventListener('keydown', e => { const k = e.key.length === 1 ? e.key.toLowerCase() : e.key; if (k === seq[pos]) { if (++pos === seq.length) { pos = 0; hack(); } } else pos = k === seq[0] ? 1 : 0; });
+  let logo = 0; $('#logo').addEventListener('click', () => { if (++logo === 5) { logo = 0; toast('Тссс… спробуй ↑ ↑ ↓ ↓ ← → ← → B A', 'warn'); } });
+  console.log('%c🛡️ SafeNet Quest', 'font:700 20px sans-serif;color:#22e4ff', '\nО, ти відкрив DevTools. Справжні хакери використовують свої суперсили на добро. 💙');
+})();
+
+hud(); progress();
+})();
+</script>
+</body>
+</html>
